@@ -1,0 +1,1 @@
+# Arquivo vazio - Django carrega os modelos automaticamente
