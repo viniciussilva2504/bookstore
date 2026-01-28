@@ -15,15 +15,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'active', 'category', 'category_ids', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
-    
-    def validate_price(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Price must be greater than zero.")
-        return value
-    
-    def validate_title(self, value):
-        if len(value) < 3:
-            raise serializers.ValidationError("Product title must be at least 3 characters long.")
-        return value
+        fields = [
+            'id', 
+            'title', 
+            'description', 
+            'price', 
+            'active', 
+            'category',
+            'category_ids',
+            ]
+
+    def create(self, validated_data):
+        category_data = validated_data.pop('category', [])
+
+        product = Product.objects.create(**validated_data)
+        for category in category_data:
+            product.category.add(category)  
+
+        return product

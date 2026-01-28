@@ -1,20 +1,20 @@
 import factory
+from decimal import Decimal
 
-from product.models.product import Product
-from product.models.category import Category
+from product.models import Product
+from product.models import Category
 
 class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('word')
-    description = factory.Faker('text', max_nb_chars=200)
+    description = factory.Faker('text')
 
     class Meta:
         model = Category
 
 class ProductFactory(factory.django.DjangoModelFactory):
+    price = factory.LazyFunction(lambda: Decimal('100.00'))
     title = factory.Faker('word')
-    description = factory.Faker('text', max_nb_chars=500)
-    price = factory.Faker('pydecimal', left_digits=4, right_digits=2, positive=True)
-    active = factory.Iterator([True, False])
+    description = factory.Faker('text')
 
     @factory.post_generation
     def category(self, create, extracted, **kwargs):
@@ -22,8 +22,13 @@ class ProductFactory(factory.django.DjangoModelFactory):
             return
 
         if extracted:
-            for cat in extracted:
-                self.category.add(cat)
+            # Se extracted é uma lista ou queryset
+            if hasattr(extracted, '__iter__') and not isinstance(extracted, (str, Category)):
+                for cat in extracted:
+                    self.category.add(cat)
+            else:
+                # Se é uma única categoria
+                self.category.add(extracted)
 
     class Meta:
         model = Product
