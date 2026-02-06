@@ -1,9 +1,11 @@
 import json
 
 from django.urls import reverse
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 from rest_framework.views import status
 
+from order.factories import UserFactory
 from product.factories import CategoryFactory
 from product.models import Category
 
@@ -12,6 +14,10 @@ class CategoryViewSet(APITestCase):
     client = APIClient()
 
     def setUp(self):
+        self.user = UserFactory()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         self.category = CategoryFactory(title="books")
 
     def test_get_all_category(self):
