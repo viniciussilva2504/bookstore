@@ -41,6 +41,7 @@ RUN apt-get update \
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# install postgres dependencies 
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
     && pip install psycopg2
@@ -50,7 +51,7 @@ WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 
 # quicker install as runtime deps are already installed
-RUN  poetry install --no-root
+RUN  poetry install --only main --no-root
 
 WORKDIR /app
 
