@@ -1,4 +1,4 @@
-.PHONY: build run stop shell test migrations migrate clean lint format help
+.PHONY: build run stop shell test migrations migrate clean lint format-py check help
 
 help:
 	@echo "Available commands:"
@@ -11,7 +11,7 @@ help:
 	@echo "  make migrate     - Apply Django migrations"
 	@echo "  make clean       - Remove container and image"
 	@echo "  make lint        - Run code linting"
-	@echo "  make format      - Format code with black"
+	@echo "  make format-py   - Format code with black"
 
 build:
 	docker build -t bookstore:latest .
@@ -39,7 +39,10 @@ clean: stop
 	docker rmi bookstore:latest || true
 
 lint:
-	poetry run flake8 . || true
+	flake8 . || true
 
-format:
-	poetry run black . || true
+format-py:
+	black . || true
+
+check:
+	flake8 .
