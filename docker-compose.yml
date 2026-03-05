@@ -9,6 +9,7 @@ services:
       - POSTGRES_USER=bookstore_dev
       - POSTGRES_PASSWORD=bookstore_dev
       - POSTGRES_DB=bookstore_dev_db
+      - POSTGRES_HOST_AUTH_METHOD=md5
     networks:
       - bookstore_network
   web:
