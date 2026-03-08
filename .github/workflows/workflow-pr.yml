@@ -1,0 +1,97 @@
+name: Python Pull Request Workflow
+
+on:
+  pull_request:
+    branches: [main, master]
+
+env:
+  PYTHON_VERSION: "3.14"
+  POETRY_VERSION: "2.1.4"
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    env:
+      SECRET_KEY: "ci-test-secret-key-not-for-production"
+      DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"
+      SQL_ENGINE: "django.db.backends.sqlite3"
+      SQL_DATABASE: "db.sqlite3"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Run migrations
+        run: poetry run python manage.py migrate --run-syncdb
+
+      - name: Run tests
+        run: poetry run python manage.py test --verbosity=2
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Check syntax with py_compile
+        run: poetry run python -m py_compile manage.py
+
+      - name: Run Django system checks
+        run: poetry run python manage.py check
+        env:
+          SECRET_KEY: "ci-test-secret-key-not-for-production"
+          DEBUG: "1"
+          DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"
+          SQL_ENGINE: "django.db.backends.sqlite3"
+          SQL_DATABASE: "db.sqlite3"
