@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=bookstore_dev
+      - POSTGRES_PASSWORD=bookstore_dev
+      - POSTGRES_DB=bookstore_dev_db
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    networks:
+      - bookstore_network
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    env_file:
+      - ./env.dev
+    networks:
+      - bookstore_network
+      - frontend
+    depends_on:
+      - db
+networks:
+  bookstore_network:
+    driver: bridge
+  frontend:
+    driver: bridge
+volumes:
+  postgres_data:
