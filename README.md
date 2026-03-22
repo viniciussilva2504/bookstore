@@ -111,4 +111,3 @@ Variables are defined in the `env.dev` file. Main ones:
 
 ## License
 
-This project is for educational purposes only.
