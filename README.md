@@ -1,5 +1,7 @@
 # 📚 Bookstore API
 
+https://vjsilva250490.pythonanywhere.com/bookstore/v1/product/
+
 REST API for bookstore management, built with **Django 6** and **Django REST Framework**.
 
 ## Technologies
