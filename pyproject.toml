@@ -11,6 +11,7 @@ djangorestframework = ">=3.16.1,<4.0.0"
 psycopg2-binary = "^2.9.10"
 whitenoise = "^6.12.0"
 gunicorn = "^25.1.0"
+python-dotenv = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = ">=3.3.3,<4.0.0"

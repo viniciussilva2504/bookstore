@@ -109,3 +109,6 @@ dmypy.json
 __pycache__
 *.pyc
 db.sqlite3
+staticfiles/
+.env
+env.dev

@@ -104,7 +104,7 @@ Variables are defined in the `env.dev` file. Main ones:
 | Variable            | Description              |
 | ------------------- | ------------------------ |
 | `SECRET_KEY`        | Django secret key        |
-| `DEBUG`             | Debug mode (0 or 1)     |
+| `DEBUG`             | Debug mode (0 or 1)      |
 | `POSTGRES_USER`     | PostgreSQL user          |
 | `POSTGRES_PASSWORD` | PostgreSQL password      |
 | `POSTGRES_DB`       | Database name            |

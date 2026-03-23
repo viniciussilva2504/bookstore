@@ -3,6 +3,12 @@
 
 import os
 import sys
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load .env file from project root
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 
 def main():
