@@ -2,55 +2,73 @@
 
 ## Pré-requisitos
 - Conta no [PythonAnywhere](https://www.pythonanywhere.com/) (free tier funciona)
-- Código no GitHub
+- Código no GitHub: https://github.com/viniciussilva2504/bookstore.git
 
 ---
 
 ## Passo a Passo
 
-### 1. Abra o Console Bash no PythonAnywhere
+### 1. Crie sua conta no PythonAnywhere
 
-No dashboard, clique em **"Consoles"** > **"$ Bash"** (New console).
+1. Acesse **https://www.pythonanywhere.com/**
+2. Clique em **"Pricing & signup"**
+3. Escolha **"Create a Beginner account"** (gratuito)
+4. Preencha seus dados e confirme o email
+> **IMPORTANTE:** Anote seu username, ele será parte da sua URL final.
 
-### 2. Clone o Repositório
+### 2. Abra o Console Bash
+
+No dashboard, clique em **"Consoles"** > na seção "Other" clique em **"Bash"**.
+
+### 3. Clone o Repositório
 
 ```bash
 cd ~
-git clone https://github.com/SEU_USUARIO/bookstore.git
+git clone -b producao https://github.com/viniciussilva2504/bookstore.git
 cd bookstore
 ```
 
-### 3. Crie o Virtual Environment
+### 4. Crie o Virtual Environment
 
+Primeiro, veja qual versão do Python está disponível:
 ```bash
-mkvirtualenv --python=/usr/bin/python3.13 bookstore-venv
+ls /usr/bin/python3.*
 ```
 
-> **Nota:** PythonAnywhere free tier pode não ter Python 3.14 ainda. Use a versão mais recente disponível (3.13 ou 3.12). Verifique com `ls /usr/bin/python3.*`
+Depois crie o virtualenv (use a versão mais recente disponível):
+```bash
+mkvirtualenv --python=/usr/bin/python3.10 bookstore-venv
+```
+> Se tiver 3.12 ou 3.13 disponível, use essa versão no lugar de 3.10.
 
-### 4. Instale as Dependências
+### 5. Instale as Dependências
 
 ```bash
 cd ~/bookstore
 pip install -r requirements.txt
 ```
 
-### 5. Configure o Arquivo .env
+### 6. Configure o Arquivo .env
 
 ```bash
 cd ~/bookstore
 cp .env.production .env
 ```
 
-Edite o `.env` com seus dados:
+Gere uma SECRET_KEY segura:
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+Copie a chave gerada e edite o `.env`:
 ```bash
 nano .env
 ```
 
-Preencha:
+Substitua `SEU_USUARIO` pelo seu username do PythonAnywhere e cole a SECRET_KEY:
 ```
 DEBUG=0
-SECRET_KEY=gere-uma-chave-aqui
+SECRET_KEY=COLE_A_CHAVE_GERADA_AQUI
 DJANGO_ALLOWED_HOSTS=SEU_USUARIO.pythonanywhere.com
 CSRF_TRUSTED_ORIGINS=https://SEU_USUARIO.pythonanywhere.com
 SECURE_SSL_REDIRECT=1
@@ -58,12 +76,9 @@ SQL_ENGINE=django.db.backends.sqlite3
 SQL_DATABASE=/home/SEU_USUARIO/bookstore/db.sqlite3
 ```
 
-**Para gerar uma SECRET_KEY segura**, execute no console:
-```bash
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-```
+Salve com **Ctrl+O**, Enter, e saia com **Ctrl+X**.
 
-### 6. Execute as Migrações e Collectstatic
+### 7. Execute as Migrações
 
 ```bash
 cd ~/bookstore
@@ -71,27 +86,33 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 python manage.py createsuperuser
 ```
+> No `createsuperuser`, defina username, email e senha para acessar o admin.
 
-### 7. Configure o Web App
+### 8. Configure o Web App
 
-No dashboard do PythonAnywhere:
+1. No dashboard, vá em **"Web"** (menu superior)
+2. Clique em **"Add a new web app"**
+3. Clique **"Next"** (aceite o domínio gratuito)
+4. Escolha **"Manual configuration"** (NÃO escolha "Django")
+5. Selecione a **mesma versão do Python** usada no virtualenv
+6. Clique **"Next"** para finalizar
 
-1. Vá em **"Web"** > **"Add a new web app"**
-2. Escolha **"Manual configuration"** (NÃO escolha Django)
-3. Selecione a versão do Python (mesma do virtualenv)
+### 9. Configure o Virtual Environment
 
-### 8. Configure o Virtual Environment
-
-Na página Web, na seção **"Virtualenv"**:
+Na página **Web**, role até a seção **"Virtualenv"** e digite:
 ```
 /home/SEU_USUARIO/.virtualenvs/bookstore-venv
 ```
+Pressione Enter para confirmar.
 
-### 9. Configure o WSGI
+### 10. Configure o WSGI
 
-Clique no link do arquivo WSGI (algo como `/var/www/SEU_USUARIO_pythonanywhere_com_wsgi.py`).
+Na página **Web**, clique no link do arquivo WSGI (em vermelho, algo como):
+```
+/var/www/SEU_USUARIO_pythonanywhere_com_wsgi.py
+```
 
-**Apague todo o conteúdo** e substitua por:
+**Apague TODO o conteúdo** e cole exatamente isto (trocando SEU_USUARIO):
 
 ```python
 import os
@@ -117,17 +138,22 @@ from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 ```
 
-### 10. Configure os Static Files
+Clique **"Save"** no canto superior direito.
 
-Na página Web, na seção **"Static files"**:
+### 11. Configure os Static Files
+
+Na página **Web**, role até **"Static files"** e adicione:
 
 | URL | Directory |
 |-----|-----------|
 | `/static/` | `/home/SEU_USUARIO/bookstore/staticfiles` |
 
-### 11. Recarregue o Web App
+### 12. Recarregue e Teste
 
-Clique no botão verde **"Reload"** no topo da página Web.
+1. Role até o topo da página **Web**
+2. Clique no botão verde **"Reload SEU_USUARIO.pythonanywhere.com"**
+3. Acesse: **https://SEU_USUARIO.pythonanywhere.com/bookstore/v1/product/**
+4. Admin: **https://SEU_USUARIO.pythonanywhere.com/admin/**
 
 ### 12. Teste
 
